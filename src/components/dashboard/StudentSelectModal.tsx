@@ -27,14 +27,14 @@ export default function StudentSelectModal({ isOpen, onClose, onSelect, students
                         initial={{ opacity: 0, scale: 0.9, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                        className="bg-slate-900/40 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] w-full max-w-4xl p-10 shadow-3xl relative overflow-hidden"
+                        className="bg-[var(--bg-card)]/80 backdrop-blur-2xl border border-[var(--border)] rounded-[2.5rem] w-full max-w-4xl p-10 shadow-3xl relative overflow-hidden"
                     >
                         {/* Decorative glow */}
-                        <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 blur-[100px] rounded-full" />
+                        <div className="absolute -top-24 -right-24 w-48 h-48 bg-[var(--accent)]/10 blur-[100px] rounded-full" />
 
                         <button
                             onClick={onClose}
-                            className="absolute top-6 right-6 text-slate-400 hover:text-white p-2 transition-colors z-20"
+                            className="absolute top-6 right-6 text-[var(--text-muted)] hover:text-[var(--text-main)] p-2 transition-colors z-20"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-8 h-8">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -42,7 +42,7 @@ export default function StudentSelectModal({ isOpen, onClose, onSelect, students
                         </button>
 
                         <div className="relative z-10">
-                            <h2 className="text-4xl font-black text-white mb-10 text-center tracking-tight">당번 변경하기</h2>
+                            <h2 className="text-4xl font-black text-[var(--text-main)] mb-10 text-center tracking-tight">Select Student</h2>
 
                             <div className="grid grid-cols-4 lg:grid-cols-5 gap-4 max-h-[60vh] overflow-y-auto custom-scrollbar p-2">
                                 {students.map((student) => (
@@ -54,7 +54,7 @@ export default function StudentSelectModal({ isOpen, onClose, onSelect, students
                                             onSelect(student);
                                             onClose();
                                         }}
-                                        className="bg-white/5 hover:bg-yellow-500 hover:text-black text-white text-2xl font-black py-8 rounded-2xl transition-all border border-white/5 hover:border-yellow-500 shadow-lg"
+                                        className="bg-[var(--bg-accent)] hover:bg-[var(--accent)] hover:text-white text-[var(--text-main)] text-2xl font-black py-8 rounded-2xl transition-all border border-[var(--border)] hover:border-[var(--accent)] shadow-lg"
                                     >
                                         {student}
                                     </motion.button>

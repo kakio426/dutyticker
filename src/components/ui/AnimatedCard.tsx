@@ -13,7 +13,7 @@ export function AnimatedCard({ children, className, ...props }: AnimatedCardProp
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -10 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className={cn("rounded-3xl shadow-xl overflow-hidden", className)}
+            className={cn("rounded-3xl shadow-xl overflow-hidden border border-[var(--border)] bg-[var(--bg-card)]", className)}
             {...props}
         >
             {children}

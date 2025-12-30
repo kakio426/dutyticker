@@ -6,6 +6,7 @@ import TimelineView from "@/components/dashboard/TimelineView";
 import AlertOverlay from "@/components/dashboard/AlertOverlay";
 import BroadcastModal from "@/components/dashboard/BroadcastModal";
 import StudentSelectModal from "@/components/dashboard/StudentSelectModal";
+import TimerCard from "@/components/dashboard/TimerCard";
 import { mockRoles } from "@/data/mockRoles";
 import { mockWeeklySchedule } from "@/data/mockWeeklySchedule";
 import { mockStudents } from "@/data/mockStudents";
@@ -13,14 +14,15 @@ import { useClassAlert } from "@/hooks/useClassAlert";
 import { useBroadcast } from "@/hooks/useBroadcast";
 import { useRoleManagement } from "@/hooks/useRoleManagement";
 import { useWeeklySchedule } from "@/hooks/useWeeklySchedule";
-import { useState } from "react";
+import { useSound } from "@/hooks/useSound";
+import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 import Link from 'next/link';
 
 export default function Home() {
   // Role Management
-  const { roles, updateAssignee } = useRoleManagement(mockRoles);
+  const { roles, updateAssignee, toggleStatus } = useRoleManagement(mockRoles);
   const currentRole = roles.find(r => r.status === 'pending') || null;
 
   // Student Select Modal State
@@ -28,10 +30,12 @@ export default function Home() {
   const [selectedRoleId, setSelectedRoleId] = useState<string | null>(null);
 
   const handleRoleClick = (roleId: string) => {
-    // Only allow editing if not in broadcast mode? Or always?
-    // Let's allow always for now.
     setSelectedRoleId(roleId);
     setIsStudentModalOpen(true);
+  };
+
+  const handleToggleStatus = (roleId: string) => {
+    toggleStatus(roleId);
   };
 
   const handleStudentSelect = (studentName: string) => {
@@ -44,8 +48,23 @@ export default function Home() {
   const { alert, dismiss } = useClassAlert(schedule);
 
   // Broadcast State
-  const { isBroadcasting, message, startBroadcast, stopBroadcast } = useBroadcast();
+  const { isBroadcasting, message, isSoundEnabled, startBroadcast, stopBroadcast, toggleSound } = useBroadcast();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { playAlert } = useSound();
+
+  // Attention Sound Loop for Broadcast
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isBroadcasting && isSoundEnabled) {
+      playAlert(); // Play immediately
+      interval = setInterval(() => {
+        playAlert();
+      }, 3500); // 3.5 seconds interval for a calm, premium notice
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isBroadcasting, isSoundEnabled, playAlert]);
 
   const handleBroadcast = (msg: string) => {
     startBroadcast(msg);
@@ -58,6 +77,8 @@ export default function Home() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onBroadcast={handleBroadcast}
+        isSoundEnabled={isSoundEnabled}
+        onToggleSound={toggleSound}
       />
       <StudentSelectModal
         isOpen={isStudentModalOpen}
@@ -67,18 +88,24 @@ export default function Home() {
       />
 
       <DashboardLayout>
-        {/* Left (or Top): Current Role Highlight or Broadcast Message */}
-        <CurrentRoleCard
-          role={currentRole}
-          broadcastMessage={message}
-          isBroadcasting={isBroadcasting}
-          onRoleClick={handleRoleClick}
-        />
+        {/* Left Side (7 cols) */}
+        <div className="lg:col-span-7 flex flex-col gap-6">
+          <CurrentRoleCard
+            role={currentRole}
+            broadcastMessage={message}
+            isBroadcasting={isBroadcasting}
+            onRoleClick={handleRoleClick}
+          />
+          <div className="h-64">
+            <TimerCard />
+          </div>
+        </div>
 
-        {/* Right (or Bottom): Timeline of all roles */}
+        {/* Right Side (5 cols) */}
         <TimelineView
           roles={roles}
           onRoleClick={handleRoleClick}
+          onToggleStatus={handleToggleStatus}
         />
       </DashboardLayout>
 
@@ -89,13 +116,12 @@ export default function Home() {
         animate={{ scale: 1, opacity: 1 }}
         className="fixed bottom-10 right-10 z-[100] flex flex-col gap-4 items-center"
       >
-        {/* Admin Link Button */}
         {!isBroadcasting && (
           <Link href="/admin">
             <motion.div
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className="p-4 bg-slate-800 text-slate-400 hover:text-white rounded-full shadow-lg border border-white/5 transition-colors"
+              className="p-4 bg-[var(--bg-card)] text-[var(--text-muted)] hover:text-[var(--text-main)] rounded-full shadow-lg border border-[var(--border)] transition-colors"
               title="Admin Settings"
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
@@ -120,7 +146,7 @@ export default function Home() {
             "p-6 rounded-full shadow-3xl transition-colors relative overflow-hidden",
             isBroadcasting
               ? 'bg-red-500 text-white'
-              : 'bg-slate-700 hover:bg-yellow-500 hover:text-black text-white'
+              : 'bg-[var(--accent)] text-white hover:scale-105 active:scale-95'
           )}
           title={isBroadcasting ? "Stop Broadcast" : "New Broadcast"}
         >

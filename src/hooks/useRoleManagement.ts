@@ -21,8 +21,19 @@ export function useRoleManagement(initialRoles: Role[]) {
         );
     };
 
+    const toggleStatus = (roleId: string) => {
+        setRoles(prevRoles =>
+            prevRoles.map(role =>
+                role.id === roleId
+                    ? { ...role, status: role.status === 'completed' ? 'pending' : 'completed' }
+                    : role
+            )
+        );
+    };
+
     return {
         roles,
-        updateAssignee
+        updateAssignee,
+        toggleStatus
     };
 }

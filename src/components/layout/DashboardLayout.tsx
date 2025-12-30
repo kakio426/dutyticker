@@ -7,11 +7,11 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
     return (
-        <div className="min-h-screen bg-slate-900 text-white p-6 font-sans">
+        <div className="min-h-screen bg-[var(--bg-page)] text-[var(--text-main)] p-6 font-sans transition-colors duration-500">
             <header className="flex justify-between items-center mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Classroom Hub</h1>
-                    <p className="text-slate-400">오늘의 1인 1역 현황판</p>
+                    <h1 className="text-3xl font-bold tracking-tight">DutyTicker</h1>
+                    <p className="text-[var(--text-muted)] font-medium">오늘의 1인 1역 현황판</p>
                 </div>
                 <Clock />
             </header>
